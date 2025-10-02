@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>漫画阅读器 - 基于笒鬼鬼API</title>
+    <title>漫画阅读器 - 纯API版本</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -372,6 +372,17 @@
             color: var(--text-color);
         }
         
+        .placeholder-image {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -505,6 +516,11 @@
             
             try {
                 const response = await fetch(`${API_BASE_URL}/api.php?name=${encodeURIComponent(keyword)}&page=1`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP错误: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.code === 200 && data.data) {
@@ -553,6 +569,11 @@
             try {
                 // 获取漫画章节列表
                 const response = await fetch(comic.link);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP错误: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.code === 200 && data.data) {
@@ -609,6 +630,11 @@
             const chapterGridEl = document.getElementById('chapterGrid');
             chapterGridEl.innerHTML = '';
             
+            if (currentState.chapters.length === 0) {
+                chapterGridEl.innerHTML = '<div class="error">暂无章节内容</div>';
+                return;
+            }
+            
             currentState.chapters.forEach((chapter, index) => {
                 const chapterItem = document.createElement('div');
                 chapterItem.className = 'chapter-item';
@@ -628,6 +654,11 @@
             try {
                 // 获取章节图片
                 const response = await fetch(`${API_BASE_URL}/api.php?item_id=${chapter.item_id}&type=pic`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP错误: ${response.status}`);
+                }
+                
                 const data = await response.json();
                 
                 if (data.code === 200 && data.data) {
